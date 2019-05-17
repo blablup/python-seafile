@@ -1,6 +1,7 @@
 import requests
 from seafileapi.utils import urljoin
 from seafileapi.exceptions import ClientHttpError
+from seafileapi.account import Account
 from seafileapi.repos import Repos
 from seafileapi.groups import Groups, AdminGroups
 from seafileapi.ping import Ping
@@ -21,6 +22,7 @@ class SeafileApiClient(object):
         self.password = password
         self._token = token
 
+        self.account = Account(self)
         self.repos = Repos(self)
         self.groups = Groups(self)
         self.admin_groups = AdminGroups(self)
