@@ -13,6 +13,22 @@ class Repos(object):
         repo_json = self.client.post('/api2/repos/', data=data).json()
         return self.get_repo(repo_json['repo_id'])
 
+    @staticmethod
+    def normalize_repo_name(repo_name):
+        """
+        Remove characters from a given repo name that would be considered restricted on Windows platforms
+        https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+        """
+        remove_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
+        for char in remove_chars:
+            repo_name = repo_name.replace(char, '')
+        # Remove leading and trailing '.'
+        repo_name = repo_name.strip('.')
+        # Replace em-dash with standard dash
+        repo_name = repo_name.replace('—', '-')
+        # Replace smart-quotes with dumb-quotes
+        return repo_name.replace('“', '"').replace('”', '"').replace('‘', '\'').replace('’', '\'')
+
     @raise_does_not_exist('The requested library does not exist')
     def get_repo(self, repo_id):
         """Get the repo which has the id `repo_id`.
