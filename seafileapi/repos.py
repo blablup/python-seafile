@@ -1,3 +1,4 @@
+# coding=utf-8
 from seafileapi.repo import Repo
 from seafileapi.utils import raise_does_not_exist
 from seafileapi.files import SeafDir
