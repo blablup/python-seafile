@@ -2,7 +2,7 @@ import io
 import os
 import posixpath
 import re
-from seafileapi.utils import querystr
+from seafileapi.utils import querystr, raise_does_not_exist
 
 ZERO_OBJ_ID = '0000000000000000000000000000000000000000'
 

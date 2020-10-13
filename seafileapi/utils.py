@@ -2,7 +2,7 @@ import string
 import sys
 import random
 from functools import wraps
-from urllib.parse import urlencode
+from six.moves.urllib.parse import urlencode
 from seafileapi.exceptions import ClientHttpError, DoesNotExist
 
 def randstring(length=0):

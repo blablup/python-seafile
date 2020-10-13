@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+from six.moves.urllib.parse import urlencode
 from seafileapi.files import SeafDir, SeafFile
 from seafileapi.utils import raise_does_not_exist
 from seafileapi.exceptions import ClientHttpError, DoesNotExist
