@@ -251,6 +251,22 @@ class Repo(object):
 
         return resp
 
+    def get_history_limit(self):
+        url = "/api2/repos/%s/history-limit/" % (self.id)
+        response = self.client.get(url).json()
+        return response['keep_days']
+
+    def set_history_limit(self, keep_days):
+        """
+        Update the history limit for this Repo
+        :param keep_days: -1 to save history indefinitely, 0 to keep no history, or any other positive integer number of days
+        :return:
+        """
+        url = "/api2/repos/%s/history-limit/" % (self.id)
+        data = {'keep_days': keep_days}
+        response = self.client.put(url, data=data).json()
+        return response['keep_days']
+
 class RepoRevision(object):
     def __init__(self, client, repo, commit_id):
         self.client = client
