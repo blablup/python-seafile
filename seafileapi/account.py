@@ -15,6 +15,12 @@ class Account(object):
         self.usage = usage
         self.total = total
 
+    def __repr__(self):
+        return '<{} "{}" active={} staff={}>'.format(self.__class__.__name__,
+                                                     self.email,
+                                                     self.is_active,
+                                                     self.is_staff)
+
     @classmethod
     def from_json(cls, client, account_json):
         account_json = utf8lize(account_json)

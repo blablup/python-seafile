@@ -17,6 +17,11 @@ class Repo(object):
         self.owner = owner
         self.perm = perm
 
+    def __repr__(self):
+        return '<{} {} "{}">'.format(self.__class__.__name__,
+                                     self.id is not None and self.id[:6] or None,
+                                     self.name)
+
     @staticmethod
     def create_from_repo_id(client,repo_id):
         url = "/api2/repos/%s/"%(repo_id)

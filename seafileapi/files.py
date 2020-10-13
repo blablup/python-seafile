@@ -27,6 +27,11 @@ class _SeafDirentBase(object):
         self.id = object_id
         self.size = size
 
+    def __repr__(self):
+        return '<{} repo={} "{}">'.format(self.__class__.__name__,
+                                          self.repo_id[:6],
+                                          self.path)
+
     @property
     def name(self):
         return posixpath.basename(self.path)
