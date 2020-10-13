@@ -2,12 +2,43 @@ from seafileapi.account import Account
 from seafileapi.exceptions import UserExisted, DoesNotExist
 
 
+class AdminUserReference(object):
+    """An account reference obtained by SeafileAdmin.list_users"""
+    def __init__(self, email, source=None):
+        self.email = email
+        self.source = source
+
+    def __repr__(self):
+        return '<{} "{}" ({})>'.format(self.__class__.__name__,
+                                       self.email,
+                                       self.source or 'Unknown source')
+
+    def resolve(self, client):
+        """Resolve this reference into a seafileapi.account.Account object, using `client`"""
+        return client.admin.get_user(self.email)
+
+
 class SeafileAdmin(object):
     def __init__(self, client):
         self.client = client
 
-    def lists_users(self, maxcount=100):
-        pass
+    def list_users(self, start=0, limit=0, scope=None):
+        """Return a list of AdminUserReference objects from the /accounts/ API"""
+        VALID_SCOPES = ['LDAP', 'DB']
+        if scope is not None and scope not in VALID_SCOPES:
+            raise ValueError('Scope can be one of {}'.format(VALID_SCOPES))
+        params = {
+            'start': start,
+            'limit': limit
+        }
+        if scope is not None:
+            params['scope'] = scope
+        response = self.client.get('/api2/accounts/', params=params)
+        response_json = response.json()
+        users = []
+        for user_json in response_json:
+            users.append(AdminUserReference(email=user_json['email'], source=user_json.get('source')))
+        return users
 
     def search_user(self, filter):
         """Search for user accounts, to be used by autocompleters"""
