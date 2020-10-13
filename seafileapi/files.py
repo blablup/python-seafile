@@ -2,8 +2,7 @@ import io
 import os
 import posixpath
 import re
-from urllib import urlencode
-from seafileapi.utils import querystr, utf8lize,raise_does_not_exist
+from seafileapi.utils import querystr
 
 ZERO_OBJ_ID = '0000000000000000000000000000000000000000'
 
@@ -70,7 +69,7 @@ class _SeafDirentBase(object):
                 new_dirent = self.repo.get_dir(os.path.join(os.path.dirname(self.path), newname))
             else:
                 new_dirent = self.repo.get_file(os.path.join(os.path.dirname(self.path), newname))
-            for key in self.__dict__.keys():
+            for key in list(self.__dict__.keys()):
                 self.__dict__[key] = new_dirent.__dict__[key]
         return succeeded
 
@@ -94,7 +93,7 @@ class _SeafDirentBase(object):
         """
         if dst_repo_id is None:
             dst_repo_id = self.repo.id
-        
+
         dirent_type = 'dir' if self.isdir else 'file'
         resp = self._copy_move_task('copy', dirent_type, dst_dir, dst_repo_id)
         return resp.status_code == 200
@@ -104,7 +103,7 @@ class _SeafDirentBase(object):
         """
         if dst_repo_id is None:
             dst_repo_id = self.repo.id
-        
+
         dirent_type = 'dir' if self.isdir else 'file'
         resp = self._copy_move_task('move', dirent_type, dst_dir, dst_repo_id)
         succeeded = resp.status_code == 200
@@ -115,7 +114,7 @@ class _SeafDirentBase(object):
                 new_dirent = new_repo.get_dir(dst_path)
             else:
                 new_dirent = new_repo.get_file(dst_path)
-            for key in self.__dict__.keys():
+            for key in list(self.__dict__.keys()):
                 self.__dict__[key] = new_dirent.__dict__[key]
         return succeeded
 
@@ -139,6 +138,16 @@ class SeafDir(_SeafDirentBase):
             self.load_entries()
 
         return self.entries
+
+    def share_to_user(self, email, permission):
+        url = '/api2/repos/%s/dir/shared_items/' % self.repo.id + querystr(p=self.path)
+        putdata = {
+            'share_type': 'user',
+            'username': email,
+            'permission': permission
+        }
+        resp = self.client.put(url, data=putdata)
+        return resp.status_code == 200
 
     def create_empty_file(self, name):
         """Create a new empty file in this dir.
@@ -194,7 +203,7 @@ class SeafDir(_SeafDirentBase):
         """
         assert path.startswith('/')
         url = '/api2/repos/%s/file/detail/' % self.repo_id
-        query = '?' + urlencode(dict(p=path))
+        query = querystr(dict(p=path))
         file_json = self.client.get(url + query).json()
 
         return SeafFile(self.repo_id, path, file_json['id'], file_json['size'],self.client)
@@ -232,7 +241,6 @@ class SeafDir(_SeafDirentBase):
         self.entries = [self._load_dirent(entry_json) for entry_json in dirents_json]
 
     def _load_dirent(self, dirent_json):
-        dirent_json = utf8lize(dirent_json)
         path = posixpath.join(self.path, dirent_json['name'])
         if dirent_json['type'] == 'file':
             return SeafFile(self.repo_id, path, dirent_json['id'], dirent_json['size'],self.client)
@@ -267,6 +275,7 @@ class SeafDir(_SeafDirentBase):
 
 class SeafFile(_SeafDirentBase):
     isdir = False
+
     def update(self, fileobj):
         """Update the content of this file"""
         pass
