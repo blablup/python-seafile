@@ -46,7 +46,7 @@ class SeafileApiClient(object):
                     resp_json = res.json()
                     if 'non_field_errors' in resp_json:
                         raise AuthenticationError(res.status_code, res.content)
-                except (TypeError, ValueError), e:
+                except (TypeError, ValueError) as e:
                     # fallback
                     raise ClientHttpError(res.status_code, res.content)
             else:
