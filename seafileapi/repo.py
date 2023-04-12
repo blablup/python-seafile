@@ -1,5 +1,4 @@
-from urllib import urlencode
-from seafileapi.utils import utf8lize
+from six.moves.urllib.parse import urlencode
 from seafileapi.files import SeafDir, SeafFile
 from seafileapi.utils import raise_does_not_exist
 from seafileapi.exceptions import ClientHttpError, DoesNotExist
@@ -18,6 +17,11 @@ class Repo(object):
         self.owner = owner
         self.perm = perm
 
+    def __repr__(self):
+        return '<{} {} "{}">'.format(self.__class__.__name__,
+                                     self.id is not None and self.id[:6] or None,
+                                     self.name)
+
     @staticmethod
     def create_from_repo_id(client,repo_id):
         url = "/api2/repos/%s/"%(repo_id)
@@ -35,7 +39,6 @@ class Repo(object):
 
     @classmethod
     def from_json(cls, client, repo_json):
-        repo_json = utf8lize(repo_json)
         repo_id = repo_json['id']
         repo_name = repo_json['name']
         try:
@@ -247,6 +250,22 @@ class Repo(object):
             raise ValueError('Invalid share operation: {}'.format(operation))
 
         return resp
+
+    def get_history_limit(self):
+        url = "/api2/repos/%s/history-limit/" % (self.id)
+        response = self.client.get(url).json()
+        return response['keep_days']
+
+    def set_history_limit(self, keep_days):
+        """
+        Update the history limit for this Repo
+        :param keep_days: -1 to save history indefinitely, 0 to keep no history, or any other positive integer number of days
+        :return:
+        """
+        url = "/api2/repos/%s/history-limit/" % (self.id)
+        data = {'keep_days': keep_days}
+        response = self.client.put(url, data=data).json()
+        return response['keep_days']
 
 class RepoRevision(object):
     def __init__(self, client, repo, commit_id):

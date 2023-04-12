@@ -1,6 +1,7 @@
 import requests
 from seafileapi.utils import urljoin
 from seafileapi.exceptions import ClientHttpError
+from seafileapi.account import AccountApi
 from seafileapi.repos import Repos
 from seafileapi.groups import Groups, AdminGroups
 from seafileapi.ping import Ping
@@ -21,6 +22,7 @@ class SeafileApiClient(object):
         self.password = password
         self._token = token
 
+        self.account = AccountApi(self)
         self.repos = Repos(self)
         self.groups = Groups(self)
         self.admin_groups = AdminGroups(self)
@@ -44,7 +46,7 @@ class SeafileApiClient(object):
                     resp_json = res.json()
                     if 'non_field_errors' in resp_json:
                         raise AuthenticationError(res.status_code, res.content)
-                except (TypeError, ValueError), e:
+                except (TypeError, ValueError) as e:
                     # fallback
                     raise ClientHttpError(res.status_code, res.content)
             else:
@@ -70,7 +72,7 @@ class SeafileApiClient(object):
     def delete(self, *args, **kwargs):
         return self._send_request('delete', *args, **kwargs)
 
-    def _send_request(self, method, url, *args, **kwargs):
+    def _send_request(self, method, url, **kwargs):
         if not url.startswith('http'):
             url = urljoin(self.server, url)
 
@@ -81,7 +83,7 @@ class SeafileApiClient(object):
         expected = kwargs.pop('expected', 200)
         if not hasattr(expected, '__iter__'):
             expected = (expected, )
-        resp = requests.request(method, url, *args, **kwargs)
+        resp = requests.request(method, url, **kwargs)
         if resp.status_code not in expected:
             msg = 'Expected %s, but get %s' % \
                   (' or '.join(map(str, expected)), resp.status_code)

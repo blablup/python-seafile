@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 setup(name='seafileapi',
@@ -12,7 +12,7 @@ setup(name='seafileapi',
       url='http://seafile.com',
       platforms=['Any'],
       packages=find_packages(),
-      install_requires=['requests'],
+      install_requires=['six', 'requests'],
       classifiers=['Development Status :: 4 - Beta',
                    'License :: OSI Approved :: BSD License',
                    'Operating System :: OS Independent',

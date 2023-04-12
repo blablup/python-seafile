@@ -7,6 +7,11 @@ class Group(object):
         self.group_id = group_id
         self.group_name = group_name
 
+    def __repr__(self):
+        return '<{} {} "{}">'.format(self.__class__.__name__,
+                                     self.group_id,
+                                     self.group_name)
+
     def list_members(self):
         url = "/api/v2.1/groups/%d/members/" % self.group_id
         resp_json = self.client.get(url, expected=[200]).json()
@@ -57,6 +62,11 @@ class AdminGroup(object):
         self.group_name = group_name
         self.owner = owner
 
+    def __repr__(self):
+        return '<{} {} "{}">'.format(self.__class__.__name__,
+                                     self.group_id,
+                                     self.group_name)
+
 
 class GroupMember(object):
     def __init__(self, client, group_id, name, email, is_admin, role):
@@ -66,6 +76,11 @@ class GroupMember(object):
         self.email = email
         self.is_admin = is_admin
         self.role = role
+
+    def __repr__(self):
+        return '<{} {} "{}">'.format(self.__class__.__name__,
+                                     self.group_id,
+                                     self.name)
 
     @classmethod
     def from_json(cls, client, group_json):
