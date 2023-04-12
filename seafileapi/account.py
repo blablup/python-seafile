@@ -4,11 +4,12 @@ class Account(object):
     """
     A seafile account
     """
-    def __init__(self, client, id, email, create_time, is_active, is_staff, usage, total):
+    def __init__(self, client, id, email, create_time, is_active, is_staff, usage, total, login_time = 0):
         self.client = client
         self.id = id
         self.email = email
         self.create_time = create_time
+        self.last_login = login_time
         self.is_active = is_active
         self.is_staff = is_staff
         self.usage = usage
@@ -24,9 +25,10 @@ class Account(object):
         account_id = account_json['id']
         email = account_json['email']
         create_time = account_json['create_time']
+        last_login = account_json['last_login']
         is_active = account_json['is_active']
         is_staff = account_json['is_staff']
         usage = account_json['usage']
         total = account_json['total']
 
-        return cls(client, account_id, email, create_time, is_active, is_staff, usage, total)
+        return cls(client, account_id, email, create_time, is_active, is_staff, usage, total, last_login)
